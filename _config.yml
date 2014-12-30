@@ -3,7 +3,7 @@ markdown: redcarpet
 highlighter: pygments
 
 # Site settings
-title: "Weslley Araujo"
+title: "Weslley Araujo - front end developer blog"
 description: > # this means to ignore newlines until "email:"
   Advices from a Brazilian front end developer
 
