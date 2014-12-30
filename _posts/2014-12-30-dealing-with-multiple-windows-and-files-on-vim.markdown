@@ -5,6 +5,7 @@ date:   2014-12-30 16:28:25
 categories: vim
 tags: vim
 image: /assets/article_images/2014-12-30-dealing-with-multiple-windows-and-files-on-vim/cat-keyboard.jpg
+comments: true
 ---
   
 
