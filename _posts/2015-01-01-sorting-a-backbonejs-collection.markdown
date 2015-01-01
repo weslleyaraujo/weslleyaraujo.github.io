@@ -8,7 +8,7 @@ image: /assets/article_images/2015-01-01-sorting-a-backbone-collection/sheeps.jp
 comments: true
 ---
 
-If you know some about [Backbone.js][Backbone.js] you also probably know that it offers you something pretty cool which are the [collections][collections]. Those are kind of a wrapper for dealing with [models](models) in a easy way, giving you awesome features, and one of those features is that you can sort those models to proper work with. I'm gonna talk about the `comparator` method and what it can help you.  
+If you know some about [Backbone.js][Backbone.js] you also probably know that it offers you something pretty cool which are the [collections][collections]. Those are kind of a wrapper for dealing with [models](models) in a easy way giving you awesome features, and one of those features is that you can sort those models to proper work with. I'm gonna talk about the `comparator` method and what it can help you.  
 
 Let's start creating a piece of code, a very simple Backbone collection:
 
@@ -34,11 +34,11 @@ cars.add({ name: 'Fusca', year: 1998 });
         
 ```
 
-Okay now our collection has some data and it can do some tricks, let's starting by realizing what happened retrieving only the year attribute from it. We are going to use the [`pluck`][pluck] method, that basically plucks an attribute from the collection and returns in a array. 
+Okay now our collection has some data and it can do some tricks, let's starting by retrieving only the year attribute from it. We are going to use the [`pluck`][pluck] method, that basically plucks an attribute from the collection and returns in a array. 
 
 So what we get is this:  
 
-```javascript
+```javascript  
 cars.pluck('year'); // [1998, 2012, 2014, 2011, 1998]
 cars.pluck('name'); // ["Gol", "Camaro", "Palio", "Ferrari", "Fusca"]
 
@@ -48,9 +48,9 @@ Notice that by the log of the name and the year we can see that this collection 
 
 ```javascript
 var CarsCollection = Backbone.Collection.extend({
-	comparator: function (a) {
-		return a.get('year');
-	}
+  comparator: function (a) {
+    return a.get('year');
+  }
 
 });
 
@@ -78,36 +78,37 @@ The `comparator` is called everytime you add an in item to the collection or by 
  
 But lets say we need some more logic here, maybe if we also need to sort those cars alphabetically by the name, how do we do that?  
 
-You can see that comparator works in a very similar way with the `Array.prototype.sort`, that basically you have to return a number positive, negative, or 0 for a equal sort . You can read more about this awesome method [here][ArraySort].
+You can see that comparator works in a very similar way with the [`Array.prototype.sort`][ArraySort], that basically you have to return a number positive, negative, or 0 for a equal sort . You can read more about this awesome method [here][ArraySort].
 
 So to do that our `comparator` should be written like this:
 
 ```javascript
 var CarsCollection = Backbone.Collection.extend({
-	comparator: function (a, b) {
-     	var year = a.get('year') - b.get('year');
-     	if (year === 0) {
-        	return a.get('name') < b.get('name') ? 1 : -1;
-       	}
+  comparator: function (a, b) {
+      var year = a.get('year') - b.get('year');
+      if (year === 0) {
+          return a.get('name') < b.get('name') ? -1 : 1;
+        }
 
-    	return year;
-	}
+      return year;
+  }
 });
 
 var cars = new CarsCollection();
       
-cars.add({ name: 'Camaro', year: 2012 });
-cars.add({ name: 'Ferrari', year: 2011 });
 cars.add({ name: 'Gol', year: 1998 });
+cars.add({ name: 'Camaro', year: 2012 });
+cars.add({ name: 'Palio', year: 2014 });
+cars.add({ name: 'Ferrari', year: 2011 });
 cars.add({ name: 'Fusca', year: 1998 });
  
 ``` 
 
 And now if we [`pluck`](http://backbonejs.org/#Collection-pluck) our data:
 
-```javascript
+```javascript 
 cars.pluck('year'); // [1998, 1998, 2011, 2012, 2014]
-cars.pluck('name'); // ["Gol", "Fusca", "Ferrari", "Camaro", "Palio"]
+cars.pluck('name'); // ["Fusca", "Gol", "Ferrari", "Camaro", "Palio"]
 
 ```   
 
@@ -121,7 +122,7 @@ Backbone has lots and lots of tricks, and the best part of it is that those tric
 
 If you wanna learn more of those Backbone tricks I highly recommend the [Advanced Backbone Patterns and Techniques](http://code.tutsplus.com/courses/advanced-backbone-patterns-and-techniques) from [Tutsplus](http://code.tutsplus.com/).
 
-[Backbone.js]: htt://backbonejs.org
+[Backbone.js]: http://backbonejs.org
 [collections]: http://backbonejs.org/#Collection
 [models]: http://backbonejs.org/#Model
 [pluck]: http://backbonejs.org/#Collection-pluck
