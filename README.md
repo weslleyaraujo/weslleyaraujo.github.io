@@ -1,3 +1,3 @@
 ## Weslley Araujo
 
-Thats my blog code :)
+Thats my [Blog](http://weslleyaraujo.github.io/) :smile:
