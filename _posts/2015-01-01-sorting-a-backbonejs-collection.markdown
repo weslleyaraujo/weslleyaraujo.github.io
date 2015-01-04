@@ -7,6 +7,7 @@ tags: javascript
 image: /assets/article_images/2015-01-01-sorting-a-backbone-collection/sheeps.jpg
 comments: true
 ---
+  
 
 If you know some about [Backbone.js][Backbone.js] you also probably know that it offers you something pretty cool which are the [collections][collections]. Those are kind of a wrapper for dealing with [models](models) in a easy way giving you awesome features, and one of those features is that you can sort those models to proper work with. I'm gonna talk about the `comparator` method and what it can help you.  
 
