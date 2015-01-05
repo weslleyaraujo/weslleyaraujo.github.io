@@ -35,7 +35,7 @@ cars.add({ name: 'Fusca', year: 1998 });
         
 ```
 
-Okay now our collection has some data and it can do some tricks, let's starting by retrieving only the year attribute from it. We are going to use the [`pluck`][pluck] method, that basically plucks an attribute from the collection and returns in a array. 
+Okay now our collection has some data and it can do some tricks, let's starting by retrieving only the year attribute from it. We are going to use the [`pluck`][BackbonePluck] method, that basically plucks an attribute from the collection and returns in a array. 
 
 So what we get is this:  
 
@@ -65,7 +65,7 @@ cars.add({ name: 'Fusca', year: 1998 });
         
 ```
 
-and now using [`pluck`](pluck) let's see what happened:
+and now using [`pluck`][BackbonePluck] let's see what happened:
 
 ```javascript
 cars.pluck('year'); // [1998, 1998, 2011, 2012, 2014]
@@ -126,5 +126,5 @@ If you wanna learn more of those Backbone tricks I highly recommend the [Advance
 [Backbone.js]: http://backbonejs.org
 [collections]: http://backbonejs.org/#Collection
 [models]: http://backbonejs.org/#Model
-[pluck]: http://backbonejs.org/#Collection-pluck
+[BackbonePluck]: http://backbonejs.org/#Collection-pluck
 [ArraySort]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
