@@ -4,7 +4,7 @@ title:  "Why you should not use your own lib/framework in production"
 date:   2015-01-07 09:31:00
 categories: development
 tags: web-development
-image: /assets/article_images/t2015-01-07-why-you-should-not-use-your-lib-framework-in-production/french.jpg
+image: /assets/article_images/2015-01-07-why-you-should-not-use-your-lib-framework-in-production/french.jpg
 comments: true
 ---
   
