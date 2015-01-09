@@ -37,7 +37,7 @@ indent_style = space
 
 ```
   
-Notice that we used the `[*]`, here is where you can specify the type (or event the name) of the file(s), and below comes your settings. You can even specify different configs from any kind of file:  
+Notice that we used the `[*]`, here is where you can specify the type (or even the name) of the file(s), and below comes your settings. You can even specify different configs from any kind of file:  
 
 
 ```c
