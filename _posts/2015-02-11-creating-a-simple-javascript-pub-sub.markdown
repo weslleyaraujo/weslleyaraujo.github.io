@@ -2,8 +2,8 @@
 layout: post
 title:  "Creating a simple Javascript pub sub"
 date:   2015-02-11 15:26:00
-categories: vim
-tags: vim
+categories: javascript
+tags: javascript
 image: /assets/article_images/2015-02-11-creating-a-simple-javascript-pub-sub/talk.jpg
 comments: true
 ---
