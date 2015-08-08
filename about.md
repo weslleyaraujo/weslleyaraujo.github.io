@@ -14,3 +14,4 @@ also you can check it out my favorite projects above:
 * [Ekans Js](http://weslleyaraujo.github.io/ekans-js) - Classic snake game
 * [Minefield](http://weslleyaraujo.github.io/minefield/) - Minesweeper game
 * [Testsuite](http://weslleyaraujo.github.io/testsuite) - Small unit test framework
+* [Dead Of Thrones](http://deadofthrones.com) - A Game of Thrones tribute to all dead characters.
