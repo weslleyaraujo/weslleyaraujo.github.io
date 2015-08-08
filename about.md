@@ -9,6 +9,8 @@ A Brazilian front end developer, with large experience in small and big companie
 I'm current working at [Netshoes](http://netshoes.com.br) and you can find and see some of my code at my [Github](http://github.com/weslleyaraujo) profile,
 also you can check it out my favorite projects above:  
 
+* [Memory Match](http://weslleyaraujo.github.io/memory-match) - Memory Match game
+* [Estrada](http://weslleyaraujo.github.io/estrada) - Lightwell router manager
 * [Ekans Js](http://weslleyaraujo.github.io/ekans-js) - Classic snake game
 * [Minefield](http://weslleyaraujo.github.io/minefield/) - Minesweeper game
 * [Testsuite](http://weslleyaraujo.github.io/testsuite) - Small unit test framework
