@@ -1,0 +1,9 @@
+# Site settings
+title: Weslley Araujo
+tag_text: Weslley Araujo
+description: Just a front end developer.
+
+# Build settings
+markdown: kramdown
+
+exclude: ["README.md"]
