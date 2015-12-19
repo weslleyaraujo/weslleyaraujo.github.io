@@ -1,52 +1,9 @@
-# Build settings
-markdown: redcarpet
-highlighter: pygments
-
 # Site settings
-title: "Weslley Araujo"
-description: > # this means to ignore newlines until "email:"
-  Advices from a Brazilian front end developer
+title: Weslley Araujo
+tag_text: Weslley Araujo
+description: Just a front end developer.
 
-email: weslleyaraujo20@gmail.com
-#blog logo
-logo: "/assets/images/df_logo.jpg"
-# blog cover
-cover: "/assets/images/background_image.jpg"
+# Build settings
+markdown: kramdown
 
-name: 'Weslley Araujo'
-author: 'Weslley Araujo'
-author_image: "/assets/images/author.jpg"
-
-paginate:	5
-
-url: "http://weslleyaraujo.github.io/" # the base hostname & protocol for your site
-baseurl: ""
-
-# social icons and sharing options
-social:
-  - icon:	twitter
-    url:	https://twitter.com/_weslleyaraujo
-    desc: Follow me on twitter
-    share_url: http://twitter.com/share
-    share_title: ?text=
-    share_link: "&amp;url="
-
-  - icon:	linkedin
-    url:	https://www.linkedin.com/profile/view?id=255814436
-    desc: Connect with me on Linkedin
-    share_title: ?t=
-    share_link: "&amp;u="
-
-  - icon:	github
-    url:	https://github.com/weslleyaraujo
-    desc:	Fork me on github
-    share_url:
-    share_title:
-    share_link:
-
-#  - icon:	google-plus
-#    url:	https://google.com/???
-#    desc:	Add me on google+
-#    share_url:
-#    share_title:
-#    share_link:
+exclude: ["README.md"]
