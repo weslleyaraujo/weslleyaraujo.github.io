@@ -5,7 +5,7 @@ title: Notes
 
 # by Weslley Araujo
 
-- [using this template](/how-to-use)
+- [hello world](/hello-world)
 
 ## contact
 
