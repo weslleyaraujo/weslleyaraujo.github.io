@@ -5,9 +5,13 @@ title: Notes
 
 # by Weslley Araujo
 
-- [hello world](/hello-world)
+Hi 👋 here is some random content
 
-## contact
+## 2024
+
+- [Netherlands](/2024/netherlands)
+
+### contact
 
 - [instagram](http://instagram.com/hi.weslley)
 - [github](https://github.com/weslleyaraujo/)
