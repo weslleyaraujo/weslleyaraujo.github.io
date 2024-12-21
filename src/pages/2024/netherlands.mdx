@@ -3,6 +3,7 @@ layout: ../../layouts/Layout.astro
 ---
 
 import { Picture } from "astro:assets";
+import Gallery from "../../components/Gallery.astro";
 
 import DSCF0602 from "../../assets/nl-2024/DSCF0602.JPG";
 import DSCF0618 from "../../assets/nl-2024/DSCF0618.JPG";
@@ -13,6 +14,8 @@ import DSCF0760 from "../../assets/nl-2024/DSCF0760.jpg";
 import DSCF1127 from "../../assets/nl-2024/DSCF1127.jpg";
 
 # Netherlands
+
+<Gallery path="nl-2024" />
 
 <Picture src={DSCF0602} formats={["avif", "webp"]} alt="Misty Ferry" />
 <Picture src={DSCF0618} formats={["avif", "webp"]} alt="Misty Scene" />

@@ -1,0 +1,26 @@
+---
+import { Picture } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  path: string;
+}
+
+const { path } = Astro.props;
+const files = Object.values<{
+  default: ImageMetadata;
+}>(import.meta.glob("../assets/*/**.jpg", { eager: true }));
+---
+
+<div>
+  {
+    files.map((file, index) => (
+      <Picture
+        src={file.default as ImageMetadata}
+        formats={["avif", "webp"]}
+        alt=""
+        key={file.default.src + index}
+      />
+    ))
+  }
+</div>
