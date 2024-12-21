@@ -3,20 +3,13 @@ import { Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
 
 interface Props {
-  path: string;
+  images: ImageMetadata[];
 }
 
-const { path } = Astro.props;
-
-const files = Object.values<{
-  default: ImageMetadata;
-}>(import.meta.glob("../assets/**/*.{jpg,JPG,jpeg}", { eager: true }));
-
-const regex = new RegExp(path, "i");
-const currentFiles = files.filter((file) => regex.test(file.default.src));
+const { images } = Astro.props;
 
 // Enhanced gap-avoiding algorithm with better distribution
-const calculateOptimalColumns = (images: typeof files) => {
+const calculateOptimalColumns = (images: ImageMetadata[]) => {
   let bestScore = Infinity;
   let optimalColumns = 3;
   let bestLayout: number[] = [];
@@ -30,10 +23,10 @@ const calculateOptimalColumns = (images: typeof files) => {
 
     // Sort images by aspect ratio and size
     const sortedImages = [...images].sort((a, b) => {
-      const ratioA = a.default.width / a.default.height;
-      const ratioB = b.default.width / b.default.height;
-      const sizeA = a.default.width * a.default.height;
-      const sizeB = b.default.width * b.default.height;
+      const ratioA = a.width / a.height;
+      const ratioB = b.width / b.height;
+      const sizeA = a.width * a.height;
+      const sizeB = b.width * b.height;
 
       // Prioritize wide images and larger images
       if (Math.abs(ratioA - ratioB) > 0.5) {
@@ -45,7 +38,7 @@ const calculateOptimalColumns = (images: typeof files) => {
     // Place images
     for (let i = 0; i < sortedImages.length; i++) {
       const file = sortedImages[i];
-      const ratio = file.default.width / file.default.height;
+      const ratio = file.width / file.height;
       const colSpan = ratio > 1.5 ? 2 : 1;
       const rowSpan = ratio < 0.8 ? 2 : 1;
 
@@ -95,10 +88,7 @@ const calculateOptimalColumns = (images: typeof files) => {
         if (remainingSpace === 1) {
           // Look ahead to see if we can fill the gap
           const nextImage = sortedImages[i + 1];
-          if (
-            !nextImage ||
-            nextImage.default.width / nextImage.default.height > 1.2
-          ) {
+          if (!nextImage || nextImage.width / nextImage.height > 1.2) {
             gaps++;
           }
         }
@@ -146,22 +136,22 @@ const getImageSize = (image: ImageMetadata) => {
   return `medium span-${rowSpan}`;
 };
 
-const optimalColumns = calculateOptimalColumns(currentFiles);
+const optimalColumns = calculateOptimalColumns(images);
 ---
 
 <div class="gallery-container">
   <div class="masonry-grid" style={`--columns: ${optimalColumns}`} role="grid">
     {
-      currentFiles.map((file, index) => (
+      images.map((image, index) => (
         <div
-          class={`masonry-item ${getImageSize(file.default)}`}
+          class={`masonry-item ${getImageSize(image)}`}
           data-index={index}
           role="button"
           tabindex="0"
           aria-label={`Open image ${index + 1} in gallery`}
         >
           <Picture
-            src={file.default as ImageMetadata}
+            src={image}
             formats={["avif", "webp"]}
             alt=""
             class="image"
