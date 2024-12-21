@@ -61,12 +61,15 @@ const optimalColumns = calculateOptimalColumns(files);
 ---
 
 <div class="gallery-container">
-  <div class="masonry-grid" style={`--columns: ${optimalColumns}`}>
+  <div class="masonry-grid" style={`--columns: ${optimalColumns}`} role="grid">
     {
       files.map((file, index) => (
         <div
           class={`masonry-item ${getImageSize(file.default)}`}
           data-index={index}
+          role="button"
+          tabindex="0"
+          aria-label={`Open image ${index + 1} in gallery`}
         >
           <Picture
             src={file.default as ImageMetadata}
@@ -81,83 +84,167 @@ const optimalColumns = calculateOptimalColumns(files);
     }
   </div>
 
-  <div class="lightbox" id="lightbox">
-    <button class="lightbox-close" aria-label="Close">×</button>
-    <button class="lightbox-nav prev" aria-label="Previous">←</button>
-    <button class="lightbox-nav next" aria-label="Next">→</button>
-    <div class="lightbox-content"></div>
+  <div
+    class="lightbox"
+    id="lightbox"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image gallery lightbox"
+  >
+    <button class="lightbox-close" aria-label="Close gallery">×</button>
+    <button class="lightbox-nav prev" aria-label="Previous image">←</button>
+    <button class="lightbox-nav next" aria-label="Next image">→</button>
+    <div class="lightbox-content" role="img" aria-label="Current image"></div>
   </div>
 </div>
 
 <script>
-  let currentIndex = 0;
-  const lightbox = document.getElementById("lightbox");
-  const lightboxContent = lightbox?.querySelector(".lightbox-content");
-  const items = document.querySelectorAll(".masonry-item");
-  const totalItems = items.length;
+  class Gallery {
+    private lightbox: HTMLElement | null;
+    private lightboxContent: HTMLElement | null;
+    private items: NodeListOf<HTMLElement>;
+    private currentIndex: number;
+    private totalItems: number;
+    private cleanup: (() => void)[];
 
-  function showImage(index: number) {
-    if (!lightbox || !lightboxContent) return;
+    constructor() {
+      this.lightbox = document.getElementById("lightbox");
+      this.lightboxContent =
+        this.lightbox?.querySelector(".lightbox-content") || null;
+      this.items = document.querySelectorAll(".masonry-item");
+      this.currentIndex = 0;
+      this.totalItems = this.items.length;
+      this.cleanup = [];
 
-    currentIndex = (index + totalItems) % totalItems;
-    const currentItem = items[currentIndex];
-    if (!currentItem) return;
+      this.init();
+    }
 
-    const img = currentItem.querySelector("img");
-    if (!img) return;
+    private init() {
+      this.setupEventListeners();
+    }
 
-    lightboxContent.innerHTML = "";
-    const newImg = img.cloneNode(true) as HTMLImageElement;
-    newImg.removeAttribute("loading");
-    lightboxContent.appendChild(newImg);
+    private showImage(index: number) {
+      if (!this.lightbox || !this.lightboxContent) return;
+
+      this.currentIndex = (index + this.totalItems) % this.totalItems;
+      const currentItem = this.items[this.currentIndex];
+      if (!currentItem) return;
+
+      const img = currentItem.querySelector("img");
+      if (!img) return;
+
+      this.lightboxContent.innerHTML = "";
+      const newImg = img.cloneNode(true) as HTMLImageElement;
+      newImg.removeAttribute("loading");
+      this.lightboxContent.appendChild(newImg);
+
+      // Update aria-label with current image index
+      this.lightboxContent.setAttribute(
+        "aria-label",
+        `Image ${this.currentIndex + 1} of ${this.totalItems}`
+      );
+    }
+
+    private closeLightbox = () => {
+      this.lightbox?.classList.remove("active");
+      document.body.style.overflow = "";
+    };
+
+    private handleKeydown = (e: KeyboardEvent) => {
+      if (!this.lightbox?.classList.contains("active")) return;
+
+      switch (e.key) {
+        case "ArrowLeft":
+          this.showImage(this.currentIndex - 1);
+          break;
+        case "ArrowRight":
+          this.showImage(this.currentIndex + 1);
+          break;
+        case "Escape":
+          this.closeLightbox();
+          break;
+      }
+    };
+
+    private handleItemClick = (item: HTMLElement) => {
+      if (!this.lightbox) return;
+      this.currentIndex = parseInt(item.getAttribute("data-index") || "0");
+      this.showImage(this.currentIndex);
+      this.lightbox.classList.add("active");
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
+    };
+
+    private handleLightboxClick = (e: MouseEvent) => {
+      // Close if clicking on the background (lightbox itself) or close button
+      if (
+        e.target === this.lightbox ||
+        (e.target as HTMLElement).closest(".lightbox-close")
+      ) {
+        this.closeLightbox();
+      }
+    };
+
+    private setupEventListeners() {
+      // Item click events
+      this.items.forEach((item) => {
+        const clickHandler = () => this.handleItemClick(item);
+        const keyHandler = (e: KeyboardEvent) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this.handleItemClick(item);
+          }
+        };
+
+        item.addEventListener("click", clickHandler);
+        item.addEventListener("keydown", keyHandler);
+
+        this.cleanup.push(() => {
+          item.removeEventListener("click", clickHandler);
+          item.removeEventListener("keydown", keyHandler);
+        });
+      });
+
+      // Navigation events
+      if (this.lightbox) {
+        this.lightbox.addEventListener("click", this.handleLightboxClick);
+        const prevButton = this.lightbox.querySelector(".prev");
+        const nextButton = this.lightbox.querySelector(".next");
+
+        prevButton?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.showImage(this.currentIndex - 1);
+        });
+
+        nextButton?.addEventListener("click", (e) => {
+          e.stopPropagation();
+          this.showImage(this.currentIndex + 1);
+        });
+
+        this.cleanup.push(() => {
+          this.lightbox?.removeEventListener("click", this.handleLightboxClick);
+          prevButton?.removeEventListener("click", () => {});
+          nextButton?.removeEventListener("click", () => {});
+        });
+      }
+
+      // Keyboard navigation
+      document.addEventListener("keydown", this.handleKeydown);
+      this.cleanup.push(() => {
+        document.removeEventListener("keydown", this.handleKeydown);
+      });
+    }
+
+    public destroy() {
+      this.cleanup.forEach((cleanup) => cleanup());
+    }
   }
 
-  // Event Listeners
-  items.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      if (!lightbox) return;
-      currentIndex = parseInt(item.getAttribute("data-index") || "0");
-      showImage(currentIndex);
-      lightbox.classList.add("active");
-    });
-  });
+  // Initialize gallery
+  const gallery = new Gallery();
 
-  // Close lightbox
-  lightbox?.querySelector(".lightbox-close")?.addEventListener("click", () => {
-    lightbox?.classList.remove("active");
-  });
-
-  // Navigation
-  lightbox?.querySelector(".prev")?.addEventListener("click", () => {
-    showImage(currentIndex - 1);
-  });
-
-  lightbox?.querySelector(".next")?.addEventListener("click", () => {
-    showImage(currentIndex + 1);
-  });
-
-  // Keyboard navigation
-  document.addEventListener("keydown", (e) => {
-    if (!lightbox?.classList.contains("active")) return;
-
-    switch (e.key) {
-      case "ArrowLeft":
-        showImage(currentIndex - 1);
-        break;
-      case "ArrowRight":
-        showImage(currentIndex + 1);
-        break;
-      case "Escape":
-        lightbox?.classList.remove("active");
-        break;
-    }
-  });
-
-  // Close on background click
-  lightbox?.addEventListener("click", (e) => {
-    if (e.target === lightbox) {
-      lightbox.classList.remove("active");
-    }
+  // Cleanup on page navigation
+  document.addEventListener("astro:before-swap", () => {
+    gallery.destroy();
   });
 </script>
 
@@ -181,6 +268,16 @@ const optimalColumns = calculateOptimalColumns(files);
     border-radius: 4px;
     overflow: hidden;
     cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .masonry-item:hover {
+    transform: scale(1.02);
+  }
+
+  .masonry-item:focus-visible {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
   }
 
   /* Row spans */
@@ -287,6 +384,22 @@ const optimalColumns = calculateOptimalColumns(files);
 
   .lightbox-nav.next {
     right: 1rem;
+  }
+
+  .lightbox-close,
+  .lightbox-nav {
+    transition: opacity 0.2s ease;
+  }
+
+  .lightbox-close:hover,
+  .lightbox-nav:hover {
+    opacity: 0.8;
+  }
+
+  .lightbox-close:focus-visible,
+  .lightbox-nav:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
   }
 
   @media (max-width: 1200px) {
