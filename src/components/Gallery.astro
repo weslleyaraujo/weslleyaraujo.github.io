@@ -11,39 +11,32 @@ const files = Object.values<{
   default: ImageMetadata;
 }>(import.meta.glob("../assets/*/**.jpg", { eager: true }));
 
-// Calculate optimal columns based on image dimensions
 const calculateOptimalColumns = (images: typeof files) => {
-  // Try different column counts (2 to 4)
   let bestGapCount = Infinity;
-  let optimalColumns = 3; // Default
+  let optimalColumns = 3;
 
   for (let cols = 2; cols <= 4; cols++) {
-    const rows: number[] = Array(cols).fill(0); // Track height of each column
+    const rows: number[] = Array(cols).fill(0);
     let gaps = 0;
 
-    // Simulate placing images
     for (const file of images) {
       const ratio = file.default.width / file.default.height;
       const colSpan = ratio > 1.5 ? 2 : 1;
       const rowSpan = ratio < 1 ? 2 : 1;
 
-      if (colSpan === 2 && cols === 2) continue; // Skip wide images in 2-col layout
+      if (colSpan === 2 && cols === 2) continue;
 
-      // Find column with minimum height
       const minCol = rows.indexOf(Math.min(...rows));
 
-      // If colSpan is 2 and there's not enough space, count as gap
       if (colSpan === 2 && minCol === cols - 1) {
         gaps++;
       } else {
-        // Update column heights
         for (let i = 0; i < colSpan && minCol + i < cols; i++) {
           rows[minCol + i] += rowSpan;
         }
       }
     }
 
-    // Check if this column count produces fewer gaps
     if (gaps < bestGapCount) {
       bestGapCount = gaps;
       optimalColumns = cols;
@@ -67,24 +60,112 @@ const getImageSize = (image: ImageMetadata) => {
 const optimalColumns = calculateOptimalColumns(files);
 ---
 
-<div class="masonry-grid" style={`--columns: ${optimalColumns}`}>
-  {
-    files.map((file) => (
-      <div class={`masonry-item ${getImageSize(file.default)}`}>
-        <Picture
-          src={file.default as ImageMetadata}
-          formats={["avif", "webp"]}
-          alt=""
-          class="image"
-          loading="lazy"
-          widths={[400, 800, 1200]}
-        />
-      </div>
-    ))
-  }
+<div class="gallery-container">
+  <div class="masonry-grid" style={`--columns: ${optimalColumns}`}>
+    {
+      files.map((file, index) => (
+        <div
+          class={`masonry-item ${getImageSize(file.default)}`}
+          data-index={index}
+        >
+          <Picture
+            src={file.default as ImageMetadata}
+            formats={["avif", "webp"]}
+            alt=""
+            class="image"
+            loading="lazy"
+            widths={[400, 800, 1200]}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" aria-label="Close">×</button>
+    <button class="lightbox-nav prev" aria-label="Previous">←</button>
+    <button class="lightbox-nav next" aria-label="Next">→</button>
+    <div class="lightbox-content"></div>
+  </div>
 </div>
 
+<script>
+  let currentIndex = 0;
+  const lightbox = document.getElementById("lightbox");
+  const lightboxContent = lightbox?.querySelector(".lightbox-content");
+  const items = document.querySelectorAll(".masonry-item");
+  const totalItems = items.length;
+
+  function showImage(index: number) {
+    if (!lightbox || !lightboxContent) return;
+
+    currentIndex = (index + totalItems) % totalItems;
+    const currentItem = items[currentIndex];
+    if (!currentItem) return;
+
+    const img = currentItem.querySelector("img");
+    if (!img) return;
+
+    lightboxContent.innerHTML = "";
+    const newImg = img.cloneNode(true) as HTMLImageElement;
+    newImg.removeAttribute("loading");
+    lightboxContent.appendChild(newImg);
+  }
+
+  // Event Listeners
+  items.forEach((item) => {
+    item.addEventListener("click", (e) => {
+      if (!lightbox) return;
+      currentIndex = parseInt(item.getAttribute("data-index") || "0");
+      showImage(currentIndex);
+      lightbox.classList.add("active");
+    });
+  });
+
+  // Close lightbox
+  lightbox?.querySelector(".lightbox-close")?.addEventListener("click", () => {
+    lightbox?.classList.remove("active");
+  });
+
+  // Navigation
+  lightbox?.querySelector(".prev")?.addEventListener("click", () => {
+    showImage(currentIndex - 1);
+  });
+
+  lightbox?.querySelector(".next")?.addEventListener("click", () => {
+    showImage(currentIndex + 1);
+  });
+
+  // Keyboard navigation
+  document.addEventListener("keydown", (e) => {
+    if (!lightbox?.classList.contains("active")) return;
+
+    switch (e.key) {
+      case "ArrowLeft":
+        showImage(currentIndex - 1);
+        break;
+      case "ArrowRight":
+        showImage(currentIndex + 1);
+        break;
+      case "Escape":
+        lightbox?.classList.remove("active");
+        break;
+    }
+  });
+
+  // Close on background click
+  lightbox?.addEventListener("click", (e) => {
+    if (e.target === lightbox) {
+      lightbox.classList.remove("active");
+    }
+  });
+</script>
+
 <style>
+  .gallery-container {
+    position: relative;
+  }
+
   .masonry-grid {
     --gap: 1rem;
     display: grid;
@@ -99,6 +180,7 @@ const optimalColumns = calculateOptimalColumns(files);
     position: relative;
     border-radius: 4px;
     overflow: hidden;
+    cursor: pointer;
   }
 
   /* Row spans */
@@ -140,6 +222,73 @@ const optimalColumns = calculateOptimalColumns(files);
     opacity: 0;
   }
 
+  /* Lightbox styles */
+  .lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    padding: 2rem;
+  }
+
+  .lightbox.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    position: relative;
+  }
+
+  .lightbox-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1001;
+    padding: 0.5rem;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    z-index: 1001;
+    padding: 1rem;
+  }
+
+  .lightbox-nav.prev {
+    left: 1rem;
+  }
+
+  .lightbox-nav.next {
+    right: 1rem;
+  }
+
   @media (max-width: 1200px) {
     .masonry-grid {
       --columns: 2;
@@ -157,6 +306,22 @@ const optimalColumns = calculateOptimalColumns(files);
     .masonry-item.large,
     .masonry-item.horizontal {
       grid-column: span 1;
+    }
+
+    .lightbox {
+      padding: 1rem;
+    }
+
+    .lightbox-nav {
+      font-size: 1.5rem;
+      padding: 0.5rem;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .lightbox {
+      background-color: rgba(0, 0, 0, 0.75);
     }
   }
 </style>
