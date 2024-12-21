@@ -8,4 +8,22 @@ export default defineConfig({
   integrations: [tailwind(), mdx()],
   site: "https://weslleyaraujo.github.io",
   base: "",
+  build: {
+    assets: "assets",
+  },
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          assetFileNames: ({ names, originalFileNames, source, type }) => {
+            return originalFileNames;
+          },
+        },
+      },
+    },
+  },
+  assets: {
+    fileDir: "src/assets",
+    preserveFilePaths: true,
+  },
 });
