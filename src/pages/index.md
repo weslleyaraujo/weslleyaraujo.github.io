@@ -9,6 +9,7 @@ blah blah, thrilling website
 
 ## 2024
 
+- [Montreal (Sep 2024)](/2024/sep/montreal)
 - [Netherlands (Oct 2024)](/2024/oct/netherlands)
 
 ### 👋

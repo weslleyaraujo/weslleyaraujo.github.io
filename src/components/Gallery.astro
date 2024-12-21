@@ -7,9 +7,13 @@ interface Props {
 }
 
 const { path } = Astro.props;
+
 const files = Object.values<{
   default: ImageMetadata;
-}>(import.meta.glob("../assets/*/**.jpg", { eager: true }));
+}>(import.meta.glob("../assets/**/*.{jpg,JPG}", { eager: true }));
+
+const regex = new RegExp(path, "i"); // Added case-insensitive flag
+const currentFiles = files.filter((file) => regex.test(file.default.src));
 
 const calculateOptimalColumns = (images: typeof files) => {
   let bestGapCount = Infinity;
@@ -49,7 +53,6 @@ const calculateOptimalColumns = (images: typeof files) => {
 const getImageSize = (image: ImageMetadata) => {
   const ratio = image.width / image.height;
   const rowSpan = ratio < 1 ? 2 : 1;
-  const colSpan = ratio > 1.5 ? 2 : 1;
 
   if (ratio > 1.7) return `horizontal span-${rowSpan}`;
   if (ratio < 0.7) return `vertical span-${rowSpan}`;
@@ -57,13 +60,13 @@ const getImageSize = (image: ImageMetadata) => {
   return `medium span-${rowSpan}`;
 };
 
-const optimalColumns = calculateOptimalColumns(files);
+const optimalColumns = calculateOptimalColumns(currentFiles);
 ---
 
 <div class="gallery-container">
   <div class="masonry-grid" style={`--columns: ${optimalColumns}`} role="grid">
     {
-      files.map((file, index) => (
+      currentFiles.map((file, index) => (
         <div
           class={`masonry-item ${getImageSize(file.default)}`}
           data-index={index}
