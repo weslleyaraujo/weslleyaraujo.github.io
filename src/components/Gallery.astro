@@ -11,18 +11,63 @@ const files = Object.values<{
   default: ImageMetadata;
 }>(import.meta.glob("../assets/*/**.jpg", { eager: true }));
 
-// Determine size based on image dimensions
+// Calculate optimal columns based on image dimensions
+const calculateOptimalColumns = (images: typeof files) => {
+  // Try different column counts (2 to 4)
+  let bestGapCount = Infinity;
+  let optimalColumns = 3; // Default
+
+  for (let cols = 2; cols <= 4; cols++) {
+    const rows: number[] = Array(cols).fill(0); // Track height of each column
+    let gaps = 0;
+
+    // Simulate placing images
+    for (const file of images) {
+      const ratio = file.default.width / file.default.height;
+      const colSpan = ratio > 1.5 ? 2 : 1;
+      const rowSpan = ratio < 1 ? 2 : 1;
+
+      if (colSpan === 2 && cols === 2) continue; // Skip wide images in 2-col layout
+
+      // Find column with minimum height
+      const minCol = rows.indexOf(Math.min(...rows));
+
+      // If colSpan is 2 and there's not enough space, count as gap
+      if (colSpan === 2 && minCol === cols - 1) {
+        gaps++;
+      } else {
+        // Update column heights
+        for (let i = 0; i < colSpan && minCol + i < cols; i++) {
+          rows[minCol + i] += rowSpan;
+        }
+      }
+    }
+
+    // Check if this column count produces fewer gaps
+    if (gaps < bestGapCount) {
+      bestGapCount = gaps;
+      optimalColumns = cols;
+    }
+  }
+
+  return optimalColumns;
+};
+
 const getImageSize = (image: ImageMetadata) => {
   const ratio = image.width / image.height;
+  const rowSpan = ratio < 1 ? 2 : 1;
+  const colSpan = ratio > 1.5 ? 2 : 1;
 
-  if (ratio > 1.7) return "horizontal";
-  if (ratio < 0.7) return "vertical";
-  if (ratio >= 0.95 && ratio <= 1.05) return "large";
-  return "medium";
+  if (ratio > 1.7) return `horizontal span-${rowSpan}`;
+  if (ratio < 0.7) return `vertical span-${rowSpan}`;
+  if (ratio >= 0.95 && ratio <= 1.05) return `large span-${rowSpan}`;
+  return `medium span-${rowSpan}`;
 };
+
+const optimalColumns = calculateOptimalColumns(files);
 ---
 
-<div class="masonry-grid">
+<div class="masonry-grid" style={`--columns: ${optimalColumns}`}>
   {
     files.map((file) => (
       <div class={`masonry-item ${getImageSize(file.default)}`}>
@@ -41,10 +86,13 @@ const getImageSize = (image: ImageMetadata) => {
 
 <style>
   .masonry-grid {
+    --gap: 1rem;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    padding: 1.5rem;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    gap: var(--gap);
+    padding: var(--gap);
+    grid-auto-rows: 200px;
+    grid-auto-flow: dense;
   }
 
   .masonry-item {
@@ -53,18 +101,25 @@ const getImageSize = (image: ImageMetadata) => {
     overflow: hidden;
   }
 
-  /* Size variations */
+  /* Row spans */
+  .masonry-item.span-1 {
+    grid-row: span 1;
+  }
+
+  .masonry-item.span-2 {
+    grid-row: span 2;
+  }
+
+  /* Column variations */
   .masonry-item.medium {
     grid-column: span 1;
   }
 
   .masonry-item.large {
     grid-column: span 2;
-    grid-row: span 2;
   }
 
   .masonry-item.vertical {
-    grid-row: span 2;
     grid-column: span 1;
   }
 
@@ -87,18 +142,18 @@ const getImageSize = (image: ImageMetadata) => {
 
   @media (max-width: 1200px) {
     .masonry-grid {
-      grid-template-columns: repeat(2, 1fr);
+      --columns: 2;
+      grid-auto-rows: 250px;
     }
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     .masonry-grid {
-      grid-template-columns: 1fr;
-      gap: 1rem;
-      padding: 1rem;
+      --gap: 0.75rem;
+      --columns: 2;
+      grid-auto-rows: 150px;
     }
 
-    .masonry-item.medium,
     .masonry-item.large,
     .masonry-item.horizontal {
       grid-column: span 1;
