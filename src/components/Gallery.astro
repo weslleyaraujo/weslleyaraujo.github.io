@@ -10,49 +10,135 @@ const { path } = Astro.props;
 
 const files = Object.values<{
   default: ImageMetadata;
-}>(import.meta.glob("../assets/**/*.{jpg,JPG}", { eager: true }));
+}>(import.meta.glob("../assets/**/*.{jpg,JPG,jpeg}", { eager: true }));
 
-const regex = new RegExp(path, "i"); // Added case-insensitive flag
+const regex = new RegExp(path, "i");
 const currentFiles = files.filter((file) => regex.test(file.default.src));
 
+// Enhanced gap-avoiding algorithm with better distribution
 const calculateOptimalColumns = (images: typeof files) => {
-  let bestGapCount = Infinity;
+  let bestScore = Infinity;
   let optimalColumns = 3;
+  let bestLayout: number[] = [];
 
+  // Try different column counts
   for (let cols = 2; cols <= 4; cols++) {
     const rows: number[] = Array(cols).fill(0);
+    const layout: number[] = [];
     let gaps = 0;
+    let consecutiveWideImages = 0;
 
-    for (const file of images) {
+    // Sort images by aspect ratio and size
+    const sortedImages = [...images].sort((a, b) => {
+      const ratioA = a.default.width / a.default.height;
+      const ratioB = b.default.width / b.default.height;
+      const sizeA = a.default.width * a.default.height;
+      const sizeB = b.default.width * b.default.height;
+
+      // Prioritize wide images and larger images
+      if (Math.abs(ratioA - ratioB) > 0.5) {
+        return ratioB - ratioA;
+      }
+      return sizeB - sizeA;
+    });
+
+    // Place images
+    for (let i = 0; i < sortedImages.length; i++) {
+      const file = sortedImages[i];
       const ratio = file.default.width / file.default.height;
       const colSpan = ratio > 1.5 ? 2 : 1;
-      const rowSpan = ratio < 1 ? 2 : 1;
+      const rowSpan = ratio < 0.8 ? 2 : 1;
 
-      if (colSpan === 2 && cols === 2) continue;
+      // Handle 2-column layout differently
+      if (cols === 2) {
+        if (colSpan === 2) {
+          consecutiveWideImages++;
+          if (consecutiveWideImages > 2) {
+            layout.push(1);
+            for (let j = 0; j < 1; j++) {
+              const minCol = rows.indexOf(Math.min(...rows));
+              rows[minCol] += rowSpan;
+            }
+            continue;
+          }
+        } else {
+          consecutiveWideImages = 0;
+        }
+      }
 
-      const minCol = rows.indexOf(Math.min(...rows));
+      // Find optimal position
+      let bestPosition = 0;
+      let bestScore = Infinity;
 
-      if (colSpan === 2 && minCol === cols - 1) {
-        gaps++;
-      } else {
-        for (let i = 0; i < colSpan && minCol + i < cols; i++) {
-          rows[minCol + i] += rowSpan;
+      for (let pos = 0; pos <= cols - colSpan; pos++) {
+        const positionScore = calculatePositionScore(
+          rows,
+          pos,
+          colSpan,
+          rowSpan
+        );
+        if (positionScore < bestScore) {
+          bestScore = positionScore;
+          bestPosition = pos;
+        }
+      }
+
+      // Update layout
+      layout.push(colSpan);
+      for (let j = 0; j < colSpan; j++) {
+        rows[bestPosition + j] += rowSpan;
+      }
+
+      // Check for gaps
+      if (colSpan === 2) {
+        const remainingSpace = cols - (bestPosition + colSpan);
+        if (remainingSpace === 1) {
+          // Look ahead to see if we can fill the gap
+          const nextImage = sortedImages[i + 1];
+          if (
+            !nextImage ||
+            nextImage.default.width / nextImage.default.height > 1.2
+          ) {
+            gaps++;
+          }
         }
       }
     }
 
-    if (gaps < bestGapCount) {
-      bestGapCount = gaps;
+    // Calculate final score
+    const avgHeight = rows.reduce((a, b) => a + b, 0) / cols;
+    const heightVariance = rows.reduce(
+      (acc, height) => acc + Math.abs(height - avgHeight),
+      0
+    );
+    const score = gaps * 3 + heightVariance + Math.max(...rows) * 0.5;
+
+    if (score < bestScore) {
+      bestScore = score;
       optimalColumns = cols;
+      bestLayout = layout;
     }
   }
 
   return optimalColumns;
 };
 
+function calculatePositionScore(
+  rows: number[],
+  position: number,
+  colSpan: number,
+  rowSpan: number
+): number {
+  const affectedRows = rows.slice(position, position + colSpan);
+  const currentHeight = Math.max(...affectedRows);
+  const variance = Math.max(...rows) - Math.min(...rows);
+
+  return currentHeight + variance * 0.5;
+}
+
 const getImageSize = (image: ImageMetadata) => {
   const ratio = image.width / image.height;
-  const rowSpan = ratio < 1 ? 2 : 1;
+  const rowSpan = ratio < 0.8 ? 2 : 1; // Adjusted threshold
 
   if (ratio > 1.7) return `horizontal span-${rowSpan}`;
   if (ratio < 0.7) return `vertical span-${rowSpan}`;
