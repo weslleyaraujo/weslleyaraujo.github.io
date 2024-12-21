@@ -5,13 +5,13 @@ title: Notes
 
 # by Weslley Araujo
 
-Hi 👋 here is some random content
+blah blah, thrilling website
 
 ## 2024
 
-- [Netherlands](/2024/netherlands)
+- [Netherlands (Oct 2024)](/2024/oct/netherlands)
 
-### contact
+### 👋
 
 - [instagram](http://instagram.com/hi.weslley)
 - [github](https://github.com/weslleyaraujo/)
