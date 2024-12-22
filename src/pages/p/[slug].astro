@@ -1,0 +1,53 @@
+---
+import groq from "groq";
+import { picture } from "astro-sanity-picture";
+import type { SanityDocument } from "@sanity/client";
+import { loadQuery } from "../../sanity/lib/load-query";
+import type { Post } from "../../../sanity.types";
+import Gallery from "../../components/Gallery.astro";
+import Layout from "../../layouts/Layout.astro";
+
+export async function getStaticPaths() {
+  const { data: posts } = await loadQuery<SanityDocument[]>({
+    query: `*[_type == "post"]`,
+  });
+
+  return posts.map(({ slug }) => {
+    return {
+      params: {
+        slug: slug.current,
+      },
+    };
+  });
+}
+
+const { params } = Astro;
+
+const query = groq`
+*[_type == "post" && slug.current == $slug][0]{
+    ...,
+    gallery[] {
+        asset->{
+        ...,
+        metadata {
+          lqip,
+          dimensions
+        }
+      }
+    }
+  }
+`;
+
+const { data: post } = await loadQuery<Post>({
+  query,
+  params,
+});
+---
+
+<Layout
+  frontmatter={{
+    title: "",
+  }}
+>
+  <Gallery images={post.gallery?.map((current) => current.asset)} />
+</Layout>
