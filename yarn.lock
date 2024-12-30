@@ -3435,14 +3435,6 @@ astring@^1.8.0:
   resolved "https://registry.yarnpkg.com/astring/-/astring-1.9.0.tgz#cc73e6062a7eb03e7d19c22d8b0b3451fd9bfeef"
   integrity sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==
 
-astro-sanity-picture@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/astro-sanity-picture/-/astro-sanity-picture-0.2.0.tgz#5e2a775d30b36010a9db6ee851caf9284b4536d2"
-  integrity sha512-n5cXxKl7j1GOVGXktTEtdnL2lsC+gmIgSNPtJ0uHz+/Vzd//i2bDzO9OPKcfhdIj8sU8j94VMSlblFcne5TrYQ==
-  dependencies:
-    "@sanity/image-url" "^1.0.2"
-    groq "^3.6.0"
-
 astro@^5.0.5:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/astro/-/astro-5.1.1.tgz#c47ccf6c48d7d0db56ba605cc42efc65525f212e"
@@ -5289,7 +5281,7 @@ groq-js@^1.14.2:
   dependencies:
     debug "^4.3.4"
 
-groq@3.68.3, groq@^3.6.0:
+groq@3.68.3:
   version "3.68.3"
   resolved "https://registry.yarnpkg.com/groq/-/groq-3.68.3.tgz#2ea4a9e89c05dc0293d57237897919ebaef84801"
   integrity sha512-z0CCcwZFm9Gy+vHbKfTTTO09ym08eBnGfiRRZTiB1T3KMSIYevz+1Z5RMI0TqSjafVyDwx9Ehi6Wihixewf6DA==

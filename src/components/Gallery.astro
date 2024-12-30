@@ -132,8 +132,8 @@ function calculatePositionScore(
 
 // TODO: fix this
 const getImageSize = (image: SanityAssetDocument) => {
-  const ratio =
-    image.metadata.dimensions.width / image.metadata.dimensions.height;
+  const ratio = image.metadata.dimensions.aspectRatio;
+
   const rowSpan = ratio < 0.8 ? 2 : 1; // Adjusted threshold
 
   if (ratio > 1.7) return `horizontal span-${rowSpan}`;
@@ -218,6 +218,28 @@ const optimalColumns = calculateOptimalColumns(images);
       const newImg = img.cloneNode(true) as HTMLImageElement;
       newImg.removeAttribute("loading");
       this.lightboxContent.appendChild(newImg);
+      newImg.style.position = "fixed";
+      newImg.style.top = "50%";
+      newImg.style.left = "50%";
+      newImg.style.transform = "translate(-50%, -50%)";
+      newImg.style.zIndex = "1000";
+      newImg.style.maxHeight = "90%";
+      newImg.style.maxWidth = "90%";
+      newImg.style.overflow = "auto";
+      newImg.style.width = "unset";
+      newImg.style.height = "unset";
+
+      // position: fixed;
+      // top: 50%;
+      // left: 50%;
+      // transform: translate(-50%, -50%);
+      // z-index: 1000;
+      // max-width: 90%;
+      // max-height: 90%;
+      // overflow: auto;
+      // opacity: 0;
+      // transition: opacity .3s ease-in-out;
+      // border-radius: 10px;
 
       // Update aria-label with current image index
       this.lightboxContent.setAttribute(
@@ -421,12 +443,12 @@ const optimalColumns = calculateOptimalColumns(images);
   }
 
   .lightbox-content {
-    max-width: 90vw;
-    max-height: 90vh;
+    width: calc(90vw - 4rem);
+    height: calc(90vh - 4rem);
     position: relative;
   }
 
-  .lightbox-content img {
+  .lightbox-content picture {
     max-width: 100%;
     max-height: 90vh;
     object-fit: contain;

@@ -6,6 +6,7 @@ import { loadQuery } from "../../sanity/lib/load-query";
 import type { Post } from "../../../sanity.types";
 import Gallery from "../../components/Gallery.astro";
 import Layout from "../../layouts/Layout.astro";
+import type { SanityAssetDocument } from "@sanity/client";
 
 export async function getStaticPaths() {
   const { data: posts } = await loadQuery<SanityDocument[]>({
@@ -42,12 +43,11 @@ const { data: post } = await loadQuery<Post>({
   query,
   params,
 });
+
+const images = (post.gallery?.map((current) => current.asset) ??
+  []) as unknown as SanityAssetDocument[];
 ---
 
-<Layout
-  frontmatter={{
-    title: "",
-  }}
->
-  <Gallery images={post.gallery?.map((current) => current.asset)} />
+<Layout title={post.title}>
+  <Gallery images={images} />
 </Layout>

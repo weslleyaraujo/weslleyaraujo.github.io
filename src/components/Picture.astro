@@ -2,6 +2,7 @@
 interface Props {
   url: string;
   dimensions: number[];
+  fullscreen?: boolean;
 }
 
 function generateSrcSet(url: string, dimensions: number[], format: string) {
@@ -10,10 +11,10 @@ function generateSrcSet(url: string, dimensions: number[], format: string) {
     .join(", ");
 }
 
-const { url, dimensions } = Astro.props;
+const { url, dimensions, fullscreen } = Astro.props;
 ---
 
-<picture>
+<picture class:list="">
   <!-- WebP format -->
   <source
     type="image/webp"
@@ -32,3 +33,17 @@ const { url, dimensions } = Astro.props;
     decoding="async"
   />
 </picture>
+
+<style>
+  .fullscreen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    border-radius: 4px;
+  }
+</style>

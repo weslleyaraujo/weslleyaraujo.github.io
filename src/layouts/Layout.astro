@@ -6,18 +6,13 @@ import "@fontsource/jetbrains-mono/500.css";
 import { SITE_NAME, DESCRIPTION } from "../../src/config";
 
 interface Props {
-  title: string;
+  title?: string;
 }
 
-// @ts-ignore - TODO figure otu type safety on this
-const { frontmatter } = Astro.props;
+const { title } = Astro.props;
 
 const isHome = Astro.url.pathname === "/";
-
-const pageTitle = [
-  frontmatter.title ? frontmatter.title : undefined,
-  isHome ? SITE_NAME : undefined,
-]
+const pageTitle = [title ?? undefined, isHome ? SITE_NAME : undefined]
   .filter(Boolean)
   .join(" | ");
 ---
