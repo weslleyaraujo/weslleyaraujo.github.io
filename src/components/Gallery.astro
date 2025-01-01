@@ -25,7 +25,7 @@ const { images } = Astro.props;
           >
             <Picture
               url={imageBuilder.image(image).url()}
-              dimensions={[400, 800, 1200]}
+              dimensions={[1920]}
               alt={image.metadata.alt || `Image ${index + 1}`}
             />
           </div>
@@ -42,10 +42,10 @@ const { images } = Astro.props;
     aria-label="Image gallery lightbox"
   >
     <button class="lightbox-close" aria-label="Close gallery">&times;</button>
-    <button class="lightbox-nav prev" aria-label="Previous image"
-      >&#8592;</button
-    >
-    <button class="lightbox-nav next" aria-label="Next image">&#8594;</button>
+    <div class="lightbox-nav">
+      <button class="prev" aria-label="Previous image">&#8592;</button>
+      <button class="next" aria-label="Next image">&#8594;</button>
+    </div>
     <div class="lightbox-content" role="img" aria-label="Current image"></div>
   </div>
 </div>
@@ -210,21 +210,16 @@ const { images } = Astro.props;
     display: flex;
   }
 
-  .lightbox-content {
-    max-width: 90%;
-    max-height: 90%;
-  }
-
-  .lightbox img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 4px;
-  }
-
-  .lightbox-close,
   .lightbox-nav {
+    display: flex;
+    justify-content: space-between;
     position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100%;
+  }
+
+  .lightbox-nav button {
     background: none;
     border: none;
     color: white;
@@ -233,16 +228,39 @@ const { images } = Astro.props;
     padding: 1rem;
   }
 
-  .lightbox-close {
-    top: 1rem;
-    right: 1rem;
-  }
-
   .lightbox-nav.prev {
     left: 1rem;
   }
 
   .lightbox-nav.next {
     right: 1rem;
+  }
+
+  .lightbox-content {
+    max-width: 90%;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 4px;
+    object-fit: contain; /* Changed from 'cover' to 'contain' to make the image larger */
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  @media (min-width: 600px) {
+    .lightbox-content {
+      width: 100%;
+    }
   }
 </style>
