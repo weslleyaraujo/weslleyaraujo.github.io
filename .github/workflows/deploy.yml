@@ -27,7 +27,7 @@ jobs:
         uses: withastro/action@v3
         with:
           path: .
-          node-version: 18
+          node-version: 23
           package-manager: yarn@latest
 
       - name: Check dist directory
