@@ -6,19 +6,24 @@ import react from "@astrojs/react";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), mdx(), sanity({
-    projectId: 'erw67dz9',
-    dataset: 'production',
-    useCdn: true,
-    studioBasePath: '/studio'
-  }), react()],
+  integrations: [
+    tailwind(),
+    mdx(),
+    sanity({
+      projectId: "erw67dz9",
+      dataset: "production",
+      useCdn: false,
+      studioBasePath: "/studio",
+    }),
+    react(),
+  ],
   site: "https://weslleyaraujo.github.io",
   base: "",
   vite: {
     build: {
       rollupOptions: {
-        external: ['styled-components']
-      }
-    }
-  }
+        external: ["styled-components"],
+      },
+    },
+  },
 });

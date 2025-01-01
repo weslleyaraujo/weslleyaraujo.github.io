@@ -26,7 +26,6 @@ const { images } = Astro.props;
             <Picture
               url={imageBuilder.image(image).url()}
               dimensions={[1920]}
-              alt={image.metadata.alt || `Image ${index + 1}`}
             />
           </div>
         );
@@ -52,6 +51,11 @@ const { images } = Astro.props;
 
 <script>
   class Gallery {
+    private lightbox: HTMLElement | null;
+    private lightboxContent: HTMLElement | null;
+    private items: NodeList;
+    private currentIndex: number;
+
     constructor() {
       this.lightbox = document.getElementById("lightbox");
       this.lightboxContent =
@@ -62,11 +66,12 @@ const { images } = Astro.props;
       this.setupEventListeners();
     }
 
-    setupEventListeners() {
+    private setupEventListeners() {
       this.items.forEach((item, index) => {
         item.addEventListener("click", () => this.openLightbox(index));
         item.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          const event = e as KeyboardEvent;
+          if (event.key === "Enter" || event.key === " ") {
             e.preventDefault();
             this.openLightbox(index);
           }
@@ -86,39 +91,39 @@ const { images } = Astro.props;
         ?.addEventListener("click", () => this.navigate(1));
 
       document.addEventListener("keydown", (e) => {
-        if (this.lightbox.classList.contains("active")) {
+        if (this.lightbox?.classList.contains("active")) {
           if (e.key === "ArrowLeft") this.navigate(-1);
           if (e.key === "ArrowRight") this.navigate(1);
           if (e.key === "Escape") this.closeLightbox();
         }
       });
 
-      this.lightbox.addEventListener("click", (e) => {
+      this.lightbox?.addEventListener("click", (e) => {
         if (e.target === this.lightbox) this.closeLightbox();
       });
     }
 
-    openLightbox(index) {
+    private openLightbox(index: number) {
       this.currentIndex = index;
       this.updateLightboxImage();
-      this.lightbox.classList.add("active");
+      this.lightbox?.classList.add("active");
       document.body.style.overflow = "hidden";
     }
 
-    closeLightbox() {
-      this.lightbox.classList.remove("active");
+    private closeLightbox() {
+      this.lightbox?.classList.remove("active");
       document.body.style.overflow = "";
     }
 
-    navigate(direction) {
+    private navigate(direction: number) {
       this.currentIndex =
         (this.currentIndex + direction + this.items.length) % this.items.length;
       this.updateLightboxImage();
     }
 
-    updateLightboxImage() {
+    private updateLightboxImage() {
       const item = this.items[this.currentIndex];
-      const img = item.querySelector("img");
+      const img = (item as HTMLElement).querySelector("img");
 
       if (img && this.lightboxContent) {
         this.lightboxContent.innerHTML = "";
