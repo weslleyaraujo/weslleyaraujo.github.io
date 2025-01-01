@@ -1,26 +1,33 @@
 ---
+import type { GetStaticPaths } from "astro";
 import groq from "groq";
 import { loadQuery } from "../../sanity/lib/load-query";
 import Layout from "../../layouts/Layout.astro";
 import Gallery from "../../components/Gallery.astro";
 
+export const prerender = true;
+
 import type { SanityAssetDocument } from "@sanity/client";
-import type { SanityDocument } from "@sanity/client";
+// import type { SanityDocument } from "@sanity/client";
 import type { Post } from "../../../sanity.types";
 
-export async function getStaticPaths() {
-  const { data: posts } = await loadQuery<SanityDocument[]>({
-    query: `*[_type == "post"]`,
-  });
+// export async function getStaticPaths() {
+//   const { data: posts } = await loadQuery<SanityDocument[]>({
+//     query: `*[_type == "post"]`,
+//   });
 
-  return posts.map(({ slug }) => {
-    return {
-      params: {
-        slug: slug.current,
-      },
-    };
-  });
-}
+//   return posts.map(({ slug }) => {
+//     return {
+//       params: {
+//         slug: slug.current,
+//       },
+//     };
+//   });
+// }
+
+export const getStaticPaths = (() => {
+  return [{ params: { slug: "netherlands" } }];
+}) satisfies GetStaticPaths;
 
 const { params } = Astro;
 

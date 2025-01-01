@@ -15,6 +15,7 @@ const isHome = Astro.url.pathname === "/";
 const pageTitle = [title ?? undefined, isHome ? SITE_NAME : undefined]
   .filter(Boolean)
   .join(" | ");
+export const prerender = true;
 ---
 
 <!doctype html>
