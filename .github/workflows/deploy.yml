@@ -21,21 +21,7 @@ jobs:
       - name: Checkout your repository using git
         uses: actions/checkout@v4
         with:
-          lfs: true
           fetch-depth: 0 # Fetch all history for proper LFS handling
-
-      - name: Setup Git LFS
-        run: |
-          git lfs install
-          git lfs fetch --all
-          git lfs checkout
-
-      - name: Verify LFS files
-        run: |
-          echo "Checking LFS files..."
-          find src/assets -type f -name "*.jpg" -o -name "*.JPG" -o -name "*.jpeg"
-          echo "File sizes:"
-          du -h $(find src/assets -type f -name "*.jpg" -o -name "*.JPG" -o -name "*.jpeg")
 
       - name: Install, build, and upload your site
         uses: withastro/action@v3
