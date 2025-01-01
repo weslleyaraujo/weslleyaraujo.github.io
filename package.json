@@ -39,7 +39,7 @@
     "wrap-ansi": "^7.0.0"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=23.1.0"
   },
   "license": "MIT",
   "devDependencies": {
