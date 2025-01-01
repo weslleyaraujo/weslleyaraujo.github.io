@@ -25,120 +25,16 @@ const { images } = Astro.props;
           >
             <Picture
               url={imageBuilder.image(image).url()}
-              dimensions={[1920]}
+              dimensions={[800, 1400, 1920]}
             />
           </div>
         );
       })
     }
   </div>
-
-  <div
-    class="lightbox"
-    id="lightbox"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Image gallery lightbox"
-  >
-    <button class="lightbox-close" aria-label="Close gallery">&times;</button>
-    <div class="lightbox-nav">
-      <button class="prev" aria-label="Previous image">&#8592;</button>
-      <button class="next" aria-label="Next image">&#8594;</button>
-    </div>
-    <div class="lightbox-content" role="img" aria-label="Current image"></div>
-  </div>
 </div>
 
-<script>
-  class Gallery {
-    private lightbox: HTMLElement | null;
-    private lightboxContent: HTMLElement | null;
-    private items: NodeList;
-    private currentIndex: number;
-
-    constructor() {
-      this.lightbox = document.getElementById("lightbox");
-      this.lightboxContent =
-        this.lightbox?.querySelector(".lightbox-content") || null;
-      this.items = document.querySelectorAll(".masonry-item");
-      this.currentIndex = 0;
-
-      this.setupEventListeners();
-    }
-
-    private setupEventListeners() {
-      this.items.forEach((item, index) => {
-        item.addEventListener("click", () => this.openLightbox(index));
-        item.addEventListener("keydown", (e) => {
-          const event = e as KeyboardEvent;
-          if (event.key === "Enter" || event.key === " ") {
-            e.preventDefault();
-            this.openLightbox(index);
-          }
-        });
-      });
-
-      document
-        .querySelector(".lightbox-close")
-        ?.addEventListener("click", () => this.closeLightbox());
-
-      document
-        .querySelector(".lightbox-nav.prev")
-        ?.addEventListener("click", () => this.navigate(-1));
-
-      document
-        .querySelector(".lightbox-nav.next")
-        ?.addEventListener("click", () => this.navigate(1));
-
-      document.addEventListener("keydown", (e) => {
-        if (this.lightbox?.classList.contains("active")) {
-          if (e.key === "ArrowLeft") this.navigate(-1);
-          if (e.key === "ArrowRight") this.navigate(1);
-          if (e.key === "Escape") this.closeLightbox();
-        }
-      });
-
-      this.lightbox?.addEventListener("click", (e) => {
-        if (e.target === this.lightbox) this.closeLightbox();
-      });
-    }
-
-    private openLightbox(index: number) {
-      this.currentIndex = index;
-      this.updateLightboxImage();
-      this.lightbox?.classList.add("active");
-      document.body.style.overflow = "hidden";
-    }
-
-    private closeLightbox() {
-      this.lightbox?.classList.remove("active");
-      document.body.style.overflow = "";
-    }
-
-    private navigate(direction: number) {
-      this.currentIndex =
-        (this.currentIndex + direction + this.items.length) % this.items.length;
-      this.updateLightboxImage();
-    }
-
-    private updateLightboxImage() {
-      const item = this.items[this.currentIndex];
-      const img = (item as HTMLElement).querySelector("img");
-
-      if (img && this.lightboxContent) {
-        this.lightboxContent.innerHTML = "";
-        const clone = img.cloneNode();
-        this.lightboxContent.appendChild(clone);
-        this.lightboxContent.setAttribute(
-          "aria-label",
-          `Image ${this.currentIndex + 1} of ${this.items.length}`
-        );
-      }
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", () => new Gallery());
-</script>
+<script></script>
 
 <style>
   .gallery-container {
@@ -154,19 +50,19 @@ const { images } = Astro.props;
 
   @media (min-width: 600px) {
     .masonry-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(1, 1fr);
     }
   }
 
   @media (min-width: 900px) {
     .masonry-grid {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (min-width: 1200px) {
     .masonry-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 
@@ -196,76 +92,5 @@ const { images } = Astro.props;
 
   .masonry-item:hover {
     transform: scale(1.02);
-  }
-
-  .lightbox {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .lightbox.active {
-    display: flex;
-  }
-
-  .lightbox-nav {
-    display: flex;
-    justify-content: space-between;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-  }
-
-  .lightbox-nav button {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    padding: 1rem;
-  }
-
-  .lightbox-nav.prev {
-    left: 1rem;
-  }
-
-  .lightbox-nav.next {
-    right: 1rem;
-  }
-
-  .lightbox-content {
-    max-width: 90%;
-    max-height: 90vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .lightbox img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    border-radius: 4px;
-    object-fit: contain; /* Changed from 'cover' to 'contain' to make the image larger */
-  }
-
-  .lightbox-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-  }
-
-  @media (min-width: 600px) {
-    .lightbox-content {
-      width: 100%;
-    }
   }
 </style>
