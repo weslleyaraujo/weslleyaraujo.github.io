@@ -22,14 +22,29 @@ export default function Gallery({ images }: Props) {
   }, []);
 
   const chunks = useChunks({ images });
-  const { current, open } = useLightbox({ images });
+  const { current, open, next, prev } = useLightbox({ images });
 
   const lightBoxMarkup =
     current !== null ? (
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="grid grid-cols-[min-content_1fr_min-content] gap-4 min-w-full fixed inset-0 bg-slate-900/75 transition-opacity">
           <div className="flex h-screen md:p-3 align-middle">
-            <button>*</button>
+            <button onClick={next}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6 stroke-white"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18"
+                />
+              </svg>
+            </button>
           </div>
           <div className="flex items-center justify-center h-screen">
             <img
@@ -38,7 +53,22 @@ export default function Gallery({ images }: Props) {
             />
           </div>
           <div className="flex min-h-screen md:p-3 align-middle">
-            <button>*</button>
+            <button onClick={prev}>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                className="size-6 stroke-white"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
+                />
+              </svg>
+            </button>
           </div>
         </div>
         <LockBodyScroll />
