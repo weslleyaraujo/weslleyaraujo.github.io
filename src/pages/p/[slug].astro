@@ -2,7 +2,7 @@
 import groq from "groq";
 import { loadQuery } from "../../sanity/lib/load-query";
 import Layout from "../../layouts/Layout.astro";
-import Gallery from "../../components/Gallery.astro";
+import Gallery from "../../components/Gallery";
 
 export const prerender = true;
 
@@ -51,5 +51,5 @@ const images = (post.gallery?.map((current) => current.asset) ??
 ---
 
 <Layout title={post.title}>
-  <Gallery images={images} />
+  <Gallery images={images} client:load />
 </Layout>
