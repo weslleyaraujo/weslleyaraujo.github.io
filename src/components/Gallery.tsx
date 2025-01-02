@@ -5,6 +5,7 @@ import Picture from "./Picture";
 interface Props {
   images: SanityAssetDocument[];
 }
+
 export default function Gallery({ images }: Props) {
   const chunks = images.reduce<(typeof images)[]>((acc, current, index) => {
     const chunkIndex = Math.floor(index / 4);
