@@ -28,16 +28,16 @@ export default function Gallery({ images }: Props) {
     current !== null ? (
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="grid grid-cols-[min-content_1fr_min-content] gap-4 min-w-full fixed inset-0 bg-slate-900/75 transition-opacity">
-          <div className="flex h-screen p-4 align-middle">
+          <div className="flex h-screen md:p-3 align-middle">
             <button>*</button>
           </div>
-          <div className="h-screen p-4 flex justify-center">
+          <div className="flex items-center justify-center h-screen">
             <img
               src={imageBuilder.image(current).url()}
-              className="h-auto max-w-full max-h-screen justify-center "
+              className="h-auto w-auto max-h-screen"
             />
           </div>
-          <div className="flex min-h-screen p-4 align-middle">
+          <div className="flex min-h-screen md:p-3 align-middle">
             <button>*</button>
           </div>
         </div>
