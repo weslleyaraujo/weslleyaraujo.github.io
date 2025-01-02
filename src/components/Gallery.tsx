@@ -9,6 +9,7 @@ import {
   useDebounceCallback,
   useEventCallback,
   useMediaQuery,
+  useOnClickOutside,
 } from "usehooks-ts";
 
 interface Props {
@@ -22,13 +23,13 @@ export default function Gallery({ images }: Props) {
   }, []);
 
   const chunks = useChunks({ images });
-  const { current, open, next, prev } = useLightbox({ images });
+  const { current, open, next, prev, close } = useLightbox({ images });
 
   const lightBoxMarkup =
     current !== null ? (
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="grid grid-cols-[min-content_1fr_min-content] gap-4 min-w-full fixed inset-0 bg-slate-900/75 transition-opacity">
-          <div className="flex h-screen md:p-3 align-middle">
+          <div className="flex h-screen p-3 md:p-4 align-middle">
             <button onClick={next}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +53,25 @@ export default function Gallery({ images }: Props) {
               className="h-auto w-auto max-h-screen"
             />
           </div>
-          <div className="flex min-h-screen md:p-3 align-middle">
+          <div className="flex min-h-screen p-3 md:p-4 align-middle">
+            <div className="absolute top-4 right-4">
+              <button onClick={close}>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6 stroke-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18 18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
             <button onClick={prev}>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
