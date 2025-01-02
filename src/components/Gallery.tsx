@@ -1,16 +1,19 @@
-import type { SanityAssetDocument, SanityDocument } from "@sanity/client";
-import { imageBuilder } from "../sanity/lib/url-for-image";
-import Picture from "./Picture";
-import { createPortal } from "react-dom";
+import type { SanityAssetDocument } from "@sanity/client";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   useEventListener,
-  useScrollLock,
-  useDebounceCallback,
-  useEventCallback,
+  useIsClient,
   useMediaQuery,
-  useOnClickOutside,
+  useScrollLock,
 } from "usehooks-ts";
+import { imageBuilder } from "../sanity/lib/url-for-image";
+import Picture from "./Picture";
+
+const CHUNK_CONFIG = {
+  sm: 1,
+  md: 3,
+};
 
 interface Props {
   images: SanityAssetDocument[];
@@ -95,9 +98,9 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-max">
+    <div className={`grid grid-cols-${chunks.length} gap-4 auto-rows-max`}>
       {chunks.map((chunk, chunkIndex) => (
-        <div key={chunkIndex} className="grid gap-4 auto-rows-max">
+        <div key={chunkIndex} className="grid gap-4 auto-rows-max w-full">
           {chunk.map((image, index) => (
             <div key={index} role="button" onClick={() => open(image)}>
               <Picture
@@ -165,28 +168,21 @@ function LockBodyScroll() {
   return null;
 }
 
-const IMAGES_PER_ROW = {
-  sm: 1,
-  md: 2,
-  lg: 3,
-};
-
 function useChunks({ images }: { images: SanityAssetDocument[] }) {
-  const isSm = useMediaQuery("(max-width: 640px)");
-  const isMd = useMediaQuery("(min-width: 641px) and (max-width: 768px)");
-
-  const foo = useMemo(() => {
-    if (isSm) return IMAGES_PER_ROW.sm;
-    if (isMd) return IMAGES_PER_ROW.md;
-    return IMAGES_PER_ROW.lg;
-  }, [isSm, isMd]);
+  const isSm = useMediaQuery("(max-width: 760px)", { defaultValue: false });
+  const chunkCount = useMemo(() => {
+    if (isSm) return CHUNK_CONFIG.sm;
+    return CHUNK_CONFIG.md;
+  }, [isSm]);
 
   const chunks = useMemo(() => {
-    const count = Math.ceil(images.length / foo);
-    const chunks: (typeof images)[] = Array.from({ length: count }, () => []);
-    images.forEach((image, index) => chunks[index % count].push(image));
+    const chunkSize = Math.ceil(images.length / chunkCount);
+    const chunks: (typeof images)[] = Array.from(
+      { length: chunkCount },
+      (_, index) => images.slice(index * chunkSize, (index + 1) * chunkSize)
+    );
     return chunks;
-  }, [images, foo]);
+  }, [images, chunkCount]);
 
   return chunks;
 }
