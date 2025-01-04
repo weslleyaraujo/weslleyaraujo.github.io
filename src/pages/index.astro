@@ -1,13 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { loadQuery } from "../sanity/lib/load-query";
-import type { SanityDocument } from "@sanity/client";
-
-interface Post extends SanityDocument {
-  title: string;
-  slug: { current: string };
-  publishedAt: string;
-}
+import { type Post } from "../../sanity.types";
 
 const { data: posts } = await loadQuery<Post[]>({
   query: `*[_type == "post"] | order(publishedAt desc) {
@@ -19,7 +13,7 @@ const { data: posts } = await loadQuery<Post[]>({
 
 const postsByYear = posts.reduce(
   (acc, post) => {
-    const year = new Date(post.publishedAt).getFullYear();
+    const year = new Date(post.publishedAt!).getFullYear();
     if (!acc[year]) {
       acc[year] = [];
     }

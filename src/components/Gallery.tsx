@@ -27,16 +27,25 @@ export default function Gallery({ images }: Props) {
   }, []);
 
   const chunks = useChunks({ images });
-  const { current, open, next, prev, close } = useLightbox({ images });
+  const { current, open, next, prev, close, isLoading, setIsLoading } =
+    useLightbox({ images });
 
   const lightBoxMarkup =
     current !== null ? (
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
         <div className="fixed inset-0 bg-slate-900/75 transition-opacity">
           <div className="relative flex items-center justify-center h-screen">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="size-8 border-2 border-white/20 border-t-white/100 rounded-full animate-spin" />
+              </div>
+            )}
             <img
               src={imageBuilder.image(current).url()}
-              className="h-auto w-auto max-h-screen max-w-full object-contain"
+              className={`h-auto w-auto max-h-screen max-w-full object-contain transition-opacity duration-300 ${
+                isLoading ? "opacity-0" : "opacity-100"
+              }`}
+              onLoad={() => setIsLoading(false)}
             />
             <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 md:px-4">
               <button
@@ -124,24 +133,46 @@ export default function Gallery({ images }: Props) {
 
 function useLightbox({ images }: { images: SanityAssetDocument[] }) {
   const [current, setCurrent] = useState<SanityAssetDocument | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const isOpened = current !== null;
+
+  // Preload next and previous images
+  useEffect(() => {
+    if (!current) return;
+    const index = images.indexOf(current);
+    const nextImage = images[index + 1] || images[0];
+    const prevImage = images[index - 1] || images[images.length - 1];
+
+    const preloadImage = (image: SanityAssetDocument) => {
+      const img = new Image();
+      img.src = imageBuilder.image(image).url();
+    };
+
+    preloadImage(nextImage);
+    preloadImage(prevImage);
+  }, [current, images]);
+
   function next() {
     if (!isOpened) return;
+    setIsLoading(true);
     const index = images.indexOf(current);
     setCurrent(images[index + 1] ? images[index + 1] : images[0]);
   }
 
   function prev() {
     if (!isOpened) return;
+    setIsLoading(true);
     const index = images.indexOf(current);
     setCurrent(images[index - 1] ? images[index - 1] : images.at(-1)!);
   }
 
   function close() {
     setCurrent(null);
+    setIsLoading(false);
   }
 
   function open(image: SanityAssetDocument) {
+    setIsLoading(true);
     setCurrent(images[images.indexOf(image)]);
   }
 
@@ -166,6 +197,8 @@ function useLightbox({ images }: { images: SanityAssetDocument[] }) {
     prev,
     open,
     close,
+    isLoading,
+    setIsLoading,
   };
 }
 
