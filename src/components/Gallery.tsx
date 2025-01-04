@@ -108,9 +108,7 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div
-      className={`grid grid-cols-${CHUNK_CONFIG.sm} md:grid-cols-${CHUNK_CONFIG.md} lg:grid-cols-${CHUNK_CONFIG.lg} gap-2 auto-rows-max`}
-    >
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-max">
       {chunks.map((chunk, chunkIndex) => (
         <div key={chunkIndex} className="grid gap-2 auto-rows-max w-full">
           {chunk.map((image, index) => (
