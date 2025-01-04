@@ -32,34 +32,17 @@ export default function Gallery({ images }: Props) {
   const lightBoxMarkup =
     current !== null ? (
       <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div className="grid grid-cols-[min-content_1fr_min-content] gap-4 min-w-full fixed inset-0 bg-slate-900/75 transition-opacity">
-          <div className="flex h-screen p-3 md:p-4 align-middle">
-            <button onClick={next}>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="size-6 stroke-white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="flex items-center justify-center h-screen">
+        <div className="fixed inset-0 bg-slate-900/75 transition-opacity">
+          <div className="relative flex items-center justify-center h-screen">
             <img
               src={imageBuilder.image(current).url()}
-              className="h-auto w-auto max-h-screen"
+              className="h-auto w-auto max-h-screen max-w-full object-contain"
             />
-          </div>
-          <div className="flex min-h-screen p-3 md:p-4 align-middle">
-            <div className="absolute top-4 right-4">
-              <button onClick={close}>
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 md:px-4">
+              <button
+                onClick={prev}
+                className="p-2 hover:bg-slate-900/50 rounded-full"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -71,24 +54,46 @@ export default function Gallery({ images }: Props) {
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    d="M6 18 18 6M6 6l12 12"
+                    d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={next}
+                className="p-2 hover:bg-slate-900/50 rounded-full"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="size-6 stroke-white"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
                   />
                 </svg>
               </button>
             </div>
-            <button onClick={prev}>
+            <button
+              onClick={close}
+              className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-slate-900/50 hover:bg-slate-900/75 rounded-full"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke-width="1.5"
+                strokeWidth={1.5}
                 stroke="currentColor"
                 className="size-6 stroke-white"
               >
                 <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18 18 6M6 6l12 12"
                 />
               </svg>
             </button>
