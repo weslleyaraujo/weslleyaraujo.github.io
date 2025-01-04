@@ -1,0 +1,64 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { loadQuery } from "../sanity/lib/load-query";
+import type { SanityDocument } from "@sanity/client";
+
+interface Post extends SanityDocument {
+  title: string;
+  slug: { current: string };
+  publishedAt: string;
+}
+
+const { data: posts } = await loadQuery<Post[]>({
+  query: `*[_type == "post"] | order(publishedAt desc) {
+    title,
+    "slug": slug.current,
+    publishedAt
+  }`,
+});
+
+const postsByYear = posts.reduce(
+  (acc, post) => {
+    const year = new Date(post.publishedAt).getFullYear();
+    if (!acc[year]) {
+      acc[year] = [];
+    }
+    acc[year].push(post);
+    return acc;
+  },
+  {} as Record<number, Post[]>
+);
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+---
+
+<Layout title="Notes">
+  <h1>by Weslley Araujo</h1>
+
+  <p>blah blah, thrilling website</p>
+
+  {
+    years.map((year) => (
+      <section>
+        <h2>{year}</h2>
+        <ul>
+          {postsByYear[Number(year)].map((post) => (
+            <li>
+              <a href={`/p/${post.slug}`}>{post.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  <h2>👋</h2>
+  <ul>
+    <li>
+      <a href="http://instagram.com/hi.weslley" target="_blank">instagram</a>
+    </li>
+    <li>
+      <a href="https://github.com/weslleyaraujo/" target="_blank">github</a>
+    </li>
+  </ul>
+</Layout>
