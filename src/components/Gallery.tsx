@@ -1,19 +1,14 @@
 import type { SanityAssetDocument } from "@sanity/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-  useEventListener,
-  useIsClient,
-  useMediaQuery,
-  useScrollLock,
-} from "usehooks-ts";
+import { useEventListener, useMediaQuery, useScrollLock } from "usehooks-ts";
 import { imageBuilder } from "../sanity/lib/url-for-image";
 import Picture from "./Picture";
 
 const CHUNK_CONFIG = {
   sm: 1,
-  md: 3,
-  lg: 4,
+  md: 2,
+  lg: 3,
 };
 
 interface Props {
@@ -113,7 +108,9 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 auto-rows-max">
+    <div
+      className={`grid grid-cols-${CHUNK_CONFIG.sm} md:grid-cols-${CHUNK_CONFIG.md} lg:grid-cols-${CHUNK_CONFIG.lg} gap-2 auto-rows-max`}
+    >
       {chunks.map((chunk, chunkIndex) => (
         <div key={chunkIndex} className="grid gap-2 auto-rows-max w-full">
           {chunk.map((image, index) => (
