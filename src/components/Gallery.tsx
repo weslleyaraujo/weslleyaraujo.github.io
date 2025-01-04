@@ -229,6 +229,5 @@ function useChunks({ images }: { images: SanityAssetDocument[] }) {
     return chunks;
   }, [images, chunkCount]);
 
-  console.log({ chunkCount, chunks, isSm, isMd });
   return chunks;
 }
