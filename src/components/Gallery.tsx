@@ -89,7 +89,7 @@ export default function Gallery({ images }: Props) {
             </div>
             <button
               onClick={close}
-              className="absolute top-2 right-2 md:top-4 md:right-4 p-2 bg-slate-900/50 hover:bg-slate-900/75 rounded-full"
+              className="fixed top-2 right-2 md:absolute md:top-4 md:right-4 p-2 bg-slate-900/50 hover:bg-slate-900/75 rounded-full"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
