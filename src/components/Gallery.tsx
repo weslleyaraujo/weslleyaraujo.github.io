@@ -13,6 +13,7 @@ import Picture from "./Picture";
 const CHUNK_CONFIG = {
   sm: 1,
   md: 3,
+  lg: 4,
 };
 
 interface Props {
@@ -98,9 +99,9 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div className={`grid grid-cols-${chunks.length} gap-4 auto-rows-max`}>
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-2 auto-rows-max">
       {chunks.map((chunk, chunkIndex) => (
-        <div key={chunkIndex} className="grid gap-4 auto-rows-max w-full">
+        <div key={chunkIndex} className="grid gap-2 auto-rows-max w-full">
           {chunk.map((image, index) => (
             <div key={index} role="button" onClick={() => open(image)}>
               <Picture
@@ -169,11 +170,17 @@ function LockBodyScroll() {
 }
 
 function useChunks({ images }: { images: SanityAssetDocument[] }) {
-  const isSm = useMediaQuery("(max-width: 760px)", { defaultValue: false });
+  const isSm = useMediaQuery("(max-width: 767px)", { defaultValue: false });
+  const isMd = useMediaQuery("(min-width: 768px) and (max-width: 1023px)", {
+    defaultValue: false,
+  });
+  const isLg = useMediaQuery("(min-width: 1024px)", { defaultValue: false });
+
   const chunkCount = useMemo(() => {
     if (isSm) return CHUNK_CONFIG.sm;
-    return CHUNK_CONFIG.md;
-  }, [isSm]);
+    if (isMd) return CHUNK_CONFIG.md;
+    return CHUNK_CONFIG.lg;
+  }, [isSm, isMd, isLg]);
 
   const chunks = useMemo(() => {
     const chunkSize = Math.ceil(images.length / chunkCount);
@@ -184,5 +191,6 @@ function useChunks({ images }: { images: SanityAssetDocument[] }) {
     return chunks;
   }, [images, chunkCount]);
 
+  console.log({ chunkCount, chunks, isSm, isMd });
   return chunks;
 }

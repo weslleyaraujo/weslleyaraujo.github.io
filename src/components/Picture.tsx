@@ -7,7 +7,7 @@ interface Props {
 
 export default function Picture({ url, dimensions }: Props) {
   return (
-    <picture className="h-auto max-w-full rounded-lg object-cover object-center">
+    <picture className="h-auto max-w-full object-cover object-center">
       <source
         type="image/webp"
         srcSet={generateSrcSet(url, dimensions, "webp")}
@@ -19,7 +19,7 @@ export default function Picture({ url, dimensions }: Props) {
         srcSet={generateSrcSet(url, dimensions, "jpg")}
         sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
         alt="Responsive image"
-        className="h-auto max-w-full rounded-lg object-cover object-center"
+        className="h-auto max-w-full rounded-md object-cover object-center"
         loading="lazy"
         decoding="async"
       />
