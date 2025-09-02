@@ -5,25 +5,26 @@ export const postType = defineType({
   type: "document",
   fields: [
     defineField({
-      name: "title",
-      type: "string",
-    }),
-    defineField({
-      name: "slug",
-      type: "slug",
-      options: {
-        source: "title",
-        maxLength: 96,
-      },
-    }),
-    defineField({
       name: "gallery",
       type: "array",
       of: [{ type: "image", title: "image", options: { hotspot: true } }],
-    }),
-    defineField({
-      name: "publishedAt",
-      type: "datetime",
+      validation: (Rule) => Rule.required().min(1),
+      options: {
+        layout: "grid",
+      },
     }),
   ],
+  preview: {
+    select: {
+      media: "gallery.0",
+    },
+    prepare(selection) {
+      const { media } = selection;
+      return {
+        title: "Photo Set",
+        subtitle: "Gallery of photos",
+        media: media,
+      };
+    },
+  },
 });

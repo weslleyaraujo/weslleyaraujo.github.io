@@ -1,19 +1,34 @@
-import type { SanityAssetDocument } from "@sanity/client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useEventListener, useMediaQuery, useScrollLock } from "usehooks-ts";
 import { imageBuilder } from "../sanity/lib/url-for-image";
 import Picture from "./Picture";
 
-const CHUNK_CONFIG = {
-  sm: 1,
-  md: 2,
-  lg: 3,
+// Type for image objects from posts
+type PostImage = {
+  asset?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+  };
+  hotspot?: any;
+  crop?: any;
+  _type: "image";
+  _key: string;
 };
 
 interface Props {
-  images: SanityAssetDocument[];
+  images: PostImage[];
 }
+
+// Easy to customize column counts per breakpoint
+const COLUMN_CONFIG = {
+  sm: 1, // mobile (default)
+  md: 2, // tablet (768px+)
+  lg: 2, // desktop (1024px+)
+  xl: 2, // large desktop (1280px+)
+  "2xl": 5, // extra large (1536px+)
+};
 
 export default function Gallery({ images }: Props) {
   const ref = useRef<HTMLElement | null>(null);
@@ -21,7 +36,6 @@ export default function Gallery({ images }: Props) {
     ref.current = document.body;
   }, []);
 
-  const chunks = useChunks({ images });
   const { current, open, next, prev, close, isLoading, setIsLoading } =
     useLightbox({ images });
 
@@ -108,17 +122,18 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 auto-rows-max">
-      {chunks.map((chunk, chunkIndex) => (
-        <div key={chunkIndex} className="grid gap-2 auto-rows-max w-full">
-          {chunk.map((image, index) => (
-            <div key={index} role="button" onClick={() => open(image)}>
-              <Picture
-                url={imageBuilder.image(image).url()}
-                dimensions={[800, 1400, 1920]}
-              />
-            </div>
-          ))}
+    <div className="max-w-none px-4 gap-2 space-y-2 [column-count:1] sm:[column-count:2] md:[column-count:2] lg:[column-count:3] xl:[column-count:4] 2xl:[column-count:5] [column-gap:12px] [column-fill:balance]">
+      {images.map((image, index) => (
+        <div key={index} className="break-inside-avoid mb-3">
+          <button
+            onClick={() => open(image)}
+            className="w-full p-0 border-0 bg-transparent cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            <Picture
+              url={imageBuilder.image(image).url()}
+              dimensions={[800, 1400, 1920]}
+            />
+          </button>
         </div>
       ))}
       {ref.current ? createPortal(lightBoxMarkup, ref.current) : null}
@@ -126,8 +141,8 @@ export default function Gallery({ images }: Props) {
   );
 }
 
-function useLightbox({ images }: { images: SanityAssetDocument[] }) {
-  const [current, setCurrent] = useState<SanityAssetDocument | null>(null);
+function useLightbox({ images }: { images: PostImage[] }) {
+  const [current, setCurrent] = useState<PostImage | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const isOpened = current !== null;
 
@@ -138,7 +153,7 @@ function useLightbox({ images }: { images: SanityAssetDocument[] }) {
     const nextImage = images[index + 1] || images[0];
     const prevImage = images[index - 1] || images[images.length - 1];
 
-    const preloadImage = (image: SanityAssetDocument) => {
+    const preloadImage = (image: PostImage) => {
       const img = new Image();
       img.src = imageBuilder.image(image).url();
     };
@@ -166,9 +181,9 @@ function useLightbox({ images }: { images: SanityAssetDocument[] }) {
     setIsLoading(false);
   }
 
-  function open(image: SanityAssetDocument) {
+  function open(image: PostImage) {
     setIsLoading(true);
-    setCurrent(images[images.indexOf(image)]);
+    setCurrent(image);
   }
 
   useEventListener("keydown", (event) => {
@@ -200,29 +215,4 @@ function useLightbox({ images }: { images: SanityAssetDocument[] }) {
 function LockBodyScroll() {
   useScrollLock();
   return null;
-}
-
-function useChunks({ images }: { images: SanityAssetDocument[] }) {
-  const isSm = useMediaQuery("(max-width: 767px)", { defaultValue: false });
-  const isMd = useMediaQuery("(min-width: 768px) and (max-width: 1023px)", {
-    defaultValue: false,
-  });
-  const isLg = useMediaQuery("(min-width: 1024px)", { defaultValue: false });
-
-  const chunkCount = useMemo(() => {
-    if (isSm) return CHUNK_CONFIG.sm;
-    if (isMd) return CHUNK_CONFIG.md;
-    return CHUNK_CONFIG.lg;
-  }, [isSm, isMd, isLg]);
-
-  const chunks = useMemo(() => {
-    const chunkSize = Math.ceil(images.length / chunkCount);
-    const chunks: (typeof images)[] = Array.from(
-      { length: chunkCount },
-      (_, index) => images.slice(index * chunkSize, (index + 1) * chunkSize)
-    );
-    return chunks;
-  }, [images, chunkCount]);
-
-  return chunks;
 }
