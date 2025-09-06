@@ -122,7 +122,7 @@ export default function Gallery({ images }: Props) {
     ) : null;
 
   return (
-    <div className="max-w-none px-4 gap-2 space-y-2 [column-count:1] sm:[column-count:2] md:[column-count:2] lg:[column-count:3] xl:[column-count:4] 2xl:[column-count:5] [column-gap:12px] [column-fill:balance]">
+    <div className="max-w-none px-4 gap-2 space-y-2 [column-count:1] sm:[column-count:2] md:[column-count:2] lg:[column-count:3] xl:[column-count:4] 2xl:[column-count:5] [column-gap:12px] [column-fill:balance] p-6 -mx-4 -my-2 bg-white dark:-mx-8 dark:px-8">
       {images.map((image, index) => (
         <div key={index} className="break-inside-avoid mb-3">
           <button
